@@ -104,17 +104,37 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   });
 });
 
-app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
+app.get("/api/users/:_id/logs/", async (req, res) => {
+  let userId = req.params._id;
+  let user = await User.findById({ _id: userId });
+
+  let count = user.log.length;
+  //console.log(`from:${from}, to:${to}, limit:${limit}`);
+
+  let exLog = user.log.map((log) => ({
+    description: log.description,
+    duration: log.duration,
+    date: log.date,
+  }));
+
+  console.log("user found");
+  res.json({
+    username: user.username,
+    count: count,
+    _id: userId,
+    log: exLog,
+  });
+});
+
+app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
   let userId = req.params._id;
   let from = new Date(req.params.from);
   let to = new Date(req.params.to);
   let limit = req.params.limit;
   let user = await User.findById({ _id: userId });
 
-  let count = user.log.length;
-  //console.log(`from:${from}, to:${to}, limit:${limit}`);
+  let filterLog = user.log;
   if (user) {
-    let filterLog = user.log;
     if (from && to) {
       //console.log(`from:${from}, to:${to}, limit:${limit}`);
       // console.log("before filter");
@@ -134,20 +154,6 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
       }
       res.json({
         log: filterLog,
-      });
-    } else {
-      let exLog = user.log.map((log) => ({
-        description: log.description,
-        duration: log.duration,
-        date: log.date,
-      }));
-
-      console.log("user found");
-      res.json({
-        username: user.username,
-        count: count,
-        _id: userId,
-        log: exLog,
       });
     }
   }
