@@ -106,7 +106,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
 app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
   let userId = req.params._id;
-  let from = new Date(req.params.from); //convert date strings back to dates for comparison
+  let from = new Date(req.params.from);
   let to = new Date(req.params.to);
   let limit = req.params.limit;
   let user = await User.findById({ _id: userId });
@@ -114,16 +114,24 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
   let count = user.log.length;
   //console.log(`from:${from}, to:${to}, limit:${limit}`);
   if (user) {
+    let filterLog = user.log;
     if (from && to) {
-      let filterLog = user.log;
       //console.log(`from:${from}, to:${to}, limit:${limit}`);
-      filterLog = filterLog.filter(
-        (log) => new Date(log.date) >= from && new Date(log.date) <= to
-      );
+      // console.log("before filter");
+      filterLog = filterLog.filter((log) => {
+        //console.log("filter: " + log.date);
+        let date = new Date(log.date);
+        if (date >= from && date <= to) {
+          return date;
+        }
+        // if (date <= to) {
+        //   return date;
+        // }
+      });
+      //console.log("after filter");
       if (limit) {
         filterLog = filterLog.slice(0, limit);
       }
-
       res.json({
         log: filterLog,
       });
