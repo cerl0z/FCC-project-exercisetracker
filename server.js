@@ -142,7 +142,7 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
         //console.log("filter: " + log.date);
         let date = new Date(log.date);
         if (date >= from && date <= to) {
-          return date;
+          return date.toDateString();
         }
         // if (date <= to) {
         //   return date;
