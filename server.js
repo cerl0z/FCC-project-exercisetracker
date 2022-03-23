@@ -77,15 +77,15 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const descriptionToAdd = req.body.description;
   const durationToAdd = req.body.duration;
   const dateToAdd = new Date(req.body.date).toDateString();
-
+  if (!dateToAdd) {
+    dateToAdd = new Date().toDateString();
+  }
   const exObject = {
     description: descriptionToAdd,
     duration: durationToAdd,
     date: dateToAdd,
   };
-  if (dateToAdd === "") {
-    dateToAdd = new Date().toDateString();
-  }
+
   let user = await User.findByIdAndUpdate({ _id: userId });
   let newExercise = await Exercise(exObject);
 
