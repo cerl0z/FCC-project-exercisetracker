@@ -17,7 +17,7 @@ const userSchema = new Schema({
     {
       description: String,
       duration: Number,
-      date: Date,
+      date: String,
     },
   ],
 });
@@ -25,7 +25,7 @@ const userSchema = new Schema({
 const exerciseSchema = new Schema({
   description: String,
   duration: Number,
-  date: Date,
+  date: String,
 });
 
 const User = mongoose.model("User", userSchema);
@@ -76,7 +76,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const userId = req.params._id;
   const descriptionToAdd = req.body.description;
   const durationToAdd = req.body.duration;
-  const dateToAdd = req.body.date;
+  const dateToAdd = new Date(req.body.date).toDateString();
 
   const exObject = {
     description: descriptionToAdd,
@@ -84,7 +84,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     date: dateToAdd,
   };
   if (dateToAdd === "") {
-    dateToAdd = new Date().toString();
+    dateToAdd = new Date().toDateString();
   }
   let user = await User.findByIdAndUpdate({ _id: userId });
   let newExercise = await Exercise(exObject);
