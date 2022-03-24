@@ -46,7 +46,7 @@ app.post("/api/users", async (req, res) => {
 
   //if user exists return user
   if (findUser) {
-    res.json({
+    return res.json({
       _id: findUser._id,
       username: findUser.username,
     });
@@ -59,7 +59,7 @@ app.post("/api/users", async (req, res) => {
     });
     await findUser.save();
 
-    res.json({
+    return res.json({
       username: findUser.username,
       _id: findUser._id,
     });
@@ -69,7 +69,7 @@ app.post("/api/users", async (req, res) => {
 app.get("/api/users", async (req, res) => {
   let allUsers = await User.find({}).select("username _id"); //find all
 
-  res.json(allUsers);
+  return res.json(allUsers);
 });
 
 app.post("/api/users/:_id/exercises", async (req, res) => {
@@ -99,7 +99,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   await user.save();
   await newExercise.save();
 
-  res.json({
+  return res.json({
     username: user.username,
     description: newExercise.description,
     duration: newExercise.duration,
@@ -122,20 +122,20 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
     }));
 
     console.log("user found");
-    res.json({
+    return res.json({
       username: user.username,
       count: count,
       _id: userId,
       log: exLog,
     });
   } else {
-    res.json({
+    return res.json({
       error: "user not found",
     });
   }
 });
 
-app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
+app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
   let userId = req.params._id;
   let from = new Date(req.params.from);
   let to = new Date(req.params.to);
@@ -151,7 +151,7 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
         //console.log("filter: " + log.date);
         let date = new Date(log.date);
         if (date >= from && date <= to) {
-          return date;
+          return date.toDateString();
         }
         // if (date <= to) {
         //   return date;
@@ -161,13 +161,13 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
       if (limit) {
         filterLog = filterLog.slice(0, limit);
       }
-      res.json(
-        filterLog.map((log) => ({
+      return res.json({
+        log: filterLog.map((log) => ({
           description: log.description,
           duration: log.duration,
           date: log.date,
-        }))
-      );
+        })),
+      });
     }
   }
 });
