@@ -17,7 +17,7 @@ const userSchema = new Schema({
     {
       description: String,
       duration: Number,
-      date: String,
+      date: Date,
     },
   ],
 });
@@ -25,7 +25,7 @@ const userSchema = new Schema({
 const exerciseSchema = new Schema({
   description: String,
   duration: Number,
-  date: String,
+  date: Date,
 });
 
 const User = mongoose.model("User", userSchema);
@@ -46,7 +46,7 @@ app.post("/api/users", async (req, res) => {
 
   //if user exists return user
   if (findUser) {
-    return res.json({
+    res.json({
       _id: findUser._id,
       username: findUser.username,
     });
@@ -59,7 +59,7 @@ app.post("/api/users", async (req, res) => {
     });
     await findUser.save();
 
-    return res.json({
+    res.json({
       username: findUser.username,
       _id: findUser._id,
     });
@@ -69,27 +69,23 @@ app.post("/api/users", async (req, res) => {
 app.get("/api/users", async (req, res) => {
   let allUsers = await User.find({}).select("username _id"); //find all
 
-  return res.json(allUsers);
+  res.json(allUsers);
 });
 
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const userId = req.params._id;
   const descriptionToAdd = req.body.description;
   const durationToAdd = req.body.duration;
-  // console.log(`req.body.date=${req.body.date}`);
-  let dateToAdd = new Date(req.body.date.replace(/-/g, "/")).toDateString();
-  // console.log(dateToAdd);
-  if (!req.body.date) {
-    dateToAdd = new Date().toDateString();
-  }
+  const dateToAdd = req.body.date;
 
-  //const dateToAdd = new Date(req.body.date).toDateString();
   const exObject = {
     description: descriptionToAdd,
     duration: durationToAdd,
     date: dateToAdd,
   };
-
+  if (dateToAdd === "") {
+    dateToAdd = new Date().toString();
+  }
   let user = await User.findByIdAndUpdate({ _id: userId });
   let newExercise = await Exercise(exObject);
 
@@ -99,7 +95,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   await user.save();
   await newExercise.save();
 
-  return res.json({
+  res.json({
     username: user.username,
     description: newExercise.description,
     duration: newExercise.duration,
@@ -108,65 +104,42 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   });
 });
 
-app.get("/api/users/:_id/logs/", async (req, res) => {
-  let userId = req.params._id;
-  let user = await User.findById({ _id: userId });
-  if (user) {
-    let count = user.log.length;
-    //console.log(`from:${from}, to:${to}, limit:${limit}`);
-
-    let exLog = user.log.map((log) => ({
-      description: log.description,
-      duration: log.duration,
-      date: log.date,
-    }));
-
-    console.log("user found");
-    return res.json({
-      username: user.username,
-      count: count,
-      _id: userId,
-      log: exLog,
-    });
-  } else {
-    return res.json({
-      error: "user not found",
-    });
-  }
-});
-
 app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
   let userId = req.params._id;
-  let from = new Date(req.params.from);
-  let to = new Date(req.params.to);
+  let from = req.params.from;
+  let to = req.params.to;
   let limit = req.params.limit;
   let user = await User.findById({ _id: userId });
 
-  let filterLog = user.log;
+  let count = user.log.length;
+  //console.log(`from:${from}, to:${to}, limit:${limit}`);
   if (user) {
     if (from && to) {
+      let filterLog = user.log;
       //console.log(`from:${from}, to:${to}, limit:${limit}`);
-      // console.log("before filter");
-      filterLog = filterLog.filter((log) => {
-        //console.log("filter: " + log.date);
-        let date = new Date(log.date);
-        if (date >= from && date <= to) {
-          return date.toDateString();
-        }
-        // if (date <= to) {
-        //   return date;
-        // }
-      });
-      //console.log("after filter");
+      filterLog.filter(
+        (log) => log.date.valueOf() >= from && log.date.valueOf() <= to
+      );
       if (limit) {
         filterLog = filterLog.slice(0, limit);
       }
-      return res.json({
-        log: filterLog.map((log) => ({
-          description: log.description,
-          duration: log.duration,
-          date: log.date,
-        })),
+
+      res.json({
+        log: filterLog,
+      });
+    } else {
+      let exLog = user.log.map((log) => ({
+        description: log.description,
+        duration: log.duration,
+        date: log.date,
+      }));
+
+      console.log("user found");
+      res.json({
+        username: user.username,
+        count: count,
+        _id: userId,
+        log: exLog,
       });
     }
   }
