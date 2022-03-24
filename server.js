@@ -173,13 +173,11 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
     if (limit) {
       filterLog = filterLog.slice(0, limit);
     }
-    const returnLog = {
-      log: filterLog.map((log) => ({
-        description: log.description,
-        duration: log.duration,
-        date: log.date,
-      })),
-    };
+    const returnLog = filterLog.map((log) => ({
+      description: log.description,
+      duration: log.duration,
+      date: log.date,
+    }));
 
     // return res.json({
     //   log: filterLog.map((log) => ({
