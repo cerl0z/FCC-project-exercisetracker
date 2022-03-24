@@ -122,7 +122,7 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
     let exLog = user.log.map((log) => ({
       description: log.description,
       duration: log.duration,
-      date: log.date,
+      date: log.date.toString(),
     }));
 
     console.log("user found");
