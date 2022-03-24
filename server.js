@@ -78,7 +78,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const durationToAdd = req.body.duration;
   let dateToAdd = new Date(req.body.date).toDateString();
   // console.log(`req.body.date=${req.body.date}`);
-  if (dateToAdd === "") {
+  if (!dateToAdd) {
     dateToAdd = new Date().toDateString();
   }
   // let dateToAdd = new Date(req.body.date.replace(/-/g, "/")).toDateString();
@@ -176,7 +176,7 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
     const returnLog = filterLog.map((log) => ({
       description: log.description,
       duration: log.duration,
-      date: log.date,
+      date: log.date.toString(),
     }));
 
     // return res.json({
