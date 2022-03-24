@@ -111,23 +111,28 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 app.get("/api/users/:_id/logs/", async (req, res) => {
   let userId = req.params._id;
   let user = await User.findById({ _id: userId });
+  if (user) {
+    let count = user.log.length;
+    //console.log(`from:${from}, to:${to}, limit:${limit}`);
 
-  let count = user.log.length;
-  //console.log(`from:${from}, to:${to}, limit:${limit}`);
+    let exLog = user.log.map((log) => ({
+      description: log.description,
+      duration: log.duration,
+      date: log.date,
+    }));
 
-  let exLog = user.log.map((log) => ({
-    description: log.description,
-    duration: log.duration,
-    date: log.date,
-  }));
-
-  console.log("user found");
-  res.json({
-    username: user.username,
-    count: count,
-    _id: userId,
-    log: exLog,
-  });
+    console.log("user found");
+    res.json({
+      username: user.username,
+      count: count,
+      _id: userId,
+      log: exLog,
+    });
+  } else {
+    res.json({
+      error: "user not found",
+    });
+  }
 });
 
 app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
@@ -157,7 +162,16 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
         filterLog = filterLog.slice(0, limit);
       }
       res.json({
-        log: filterLog,
+        log: filterLog.map((log) => ({
+          description: log.description,
+          duration: log.duration,
+          date: log.date,
+        })),
+        // log: {
+        //   description: filterLog.description,
+        //   duration: filterLog.duration,
+        //   date: filterLog.date,
+        // },
       });
     }
   }
