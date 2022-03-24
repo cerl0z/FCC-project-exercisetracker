@@ -148,31 +148,48 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
 
   let filterLog = user.log;
   if (user) {
-    if (from && to) {
-      //console.log(`from:${from}, to:${to}, limit:${limit}`);
-      // console.log("before filter");
-      filterLog = filterLog.filter((log) => {
-        //console.log("filter: " + log.date);
-        let date = new Date(log.date);
-        if (date >= from && date <= to) {
-          return date.toDateString();
-        }
-        // if (date <= to) {
-        //   return date;
-        // }
-      });
-      //console.log("after filter");
-      if (limit) {
-        filterLog = filterLog.slice(0, limit);
-      }
-      return res.json({
-        log: filterLog.map((log) => ({
-          description: log.description,
-          duration: log.duration,
-          date: log.date,
-        })),
-      });
+    // if (from && to) {
+    //   //console.log(`from:${from}, to:${to}, limit:${limit}`);
+    //   // console.log("before filter");
+    //   filterLog = filterLog.filter((log) => {
+    //     //console.log("filter: " + log.date);
+    //     let date = new Date(log.date);
+    //     if (date >= from && date <= to) {
+    //       return date.toDateString();
+    //     }
+    //     // if (date <= to) {
+    //     //   return date;
+    //     // }
+    //   });
+    if (from) {
+      const fromDate = new Date(from);
+      filterLog = filterLog.filter((log) => new Date(log.date) > fromDate);
     }
+    if (to) {
+      const toDate = new Date(to);
+      filterLog = filterLog.filter((log) => new Date(log.date) < toDate);
+    }
+    //console.log("after filter");
+    if (limit) {
+      filterLog = filterLog.slice(0, limit);
+    }
+    const returnLog = {
+      log: filterLog.map((log) => ({
+        description: log.description,
+        duration: log.duration,
+        date: log.date,
+      })),
+    };
+
+    // return res.json({
+    //   log: filterLog.map((log) => ({
+    //     description: log.description,
+    //     duration: log.duration,
+    //     date: log.date,
+    //   })),
+    return res.json(returnLog);
+
+    //}
   }
 });
 
