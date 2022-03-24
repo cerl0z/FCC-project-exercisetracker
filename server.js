@@ -91,7 +91,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const exObject = {
     description: descriptionToAdd,
     duration: durationToAdd,
-    date: dateToAdd.toDateString(),
+    date: dateToAdd,
   };
 
   let user = await User.findByIdAndUpdate({ _id: userId });
