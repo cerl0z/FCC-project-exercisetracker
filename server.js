@@ -151,7 +151,7 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
         //console.log("filter: " + log.date);
         let date = new Date(log.date);
         if (date >= from && date <= to) {
-          return date.toDateString();
+          return date;
         }
         // if (date <= to) {
         //   return date;
@@ -161,18 +161,13 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
       if (limit) {
         filterLog = filterLog.slice(0, limit);
       }
-      res.json({
-        log: filterLog.map((log) => ({
+      res.json(
+        filterLog.map((log) => ({
           description: log.description,
           duration: log.duration,
           date: log.date,
-        })),
-        // log: {
-        //   description: filterLog.description,
-        //   duration: filterLog.duration,
-        //   date: filterLog.date,
-        // },
-      });
+        }))
+      );
     }
   }
 });
