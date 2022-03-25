@@ -104,13 +104,20 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   await user.save();
   await newExercise.save();
 
-  return res.json({
+  let userObj = {
     username: user.username,
+    _id: user._id,
+  };
+  let exObj = {
     description: newExercise.description,
     duration: newExercise.duration,
     date: newExercise.date,
-    _id: user._id,
-  });
+  };
+  let returnObj = {
+    ...userObj,
+    ...exObj,
+  };
+  return res.json(returnObj);
 });
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
