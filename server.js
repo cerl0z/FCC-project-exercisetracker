@@ -107,17 +107,12 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   let userObj = {
     username: user.username,
     _id: user._id,
-  };
-  let exObj = {
     description: newExercise.description,
     duration: newExercise.duration,
     date: newExercise.date,
   };
-  // let returnObj = {
-  //   ...userObj,
-  //   ...exObj,
-  // };
-  return res.json({ ...userObj, ...exObj });
+
+  return res.json(userObj);
 });
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
