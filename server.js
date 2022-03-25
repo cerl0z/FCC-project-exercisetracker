@@ -78,7 +78,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   const durationToAdd = parseInt(req.body.duration);
   let dateToAdd = !req.params.date
     ? new Date().toDateString()
-    : new Date(req.params.date).toDateString();
+    : new Date(req.params.date + "T00:00:00-04:00").toDateString();
 
   // console.log(`req.body.date=${req.body.date}`);
 
@@ -142,36 +142,58 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
   }
 });
 
-app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
+app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
   let userId = req.params._id;
-  let from = new Date(req.params.from);
-  let to = new Date(req.params.to);
+  let from = new Date(req.params.from + "T00:00:00-04:00");
+  let to = new Date(req.params.to + "T00:00:00-04:00");
+
+  // console.log(`req.params.to: ` + req.params.to);
+  // console.log(`To: ` + to);
   let limit = req.params.limit;
   let user = await User.findById({ _id: userId });
 
   let filterLog = user.log;
   if (user) {
-    // if (from && to) {
-    //   //console.log(`from:${from}, to:${to}, limit:${limit}`);
-    //   // console.log("before filter");
-    //   filterLog = filterLog.filter((log) => {
-    //     //console.log("filter: " + log.date);
-    //     let date = new Date(log.date);
-    //     if (date >= from && date <= to) {
-    //       return date.toDateString();
-    //     }
-    //     // if (date <= to) {
-    //     //   return date;
-    //     // }
-    //   });
     if (from) {
       const fromDate = new Date(from);
-      filterLog = filterLog.filter((log) => new Date(log.date) > fromDate);
+      filterLog = filterLog.filter((log) => {
+        // console.log("from: " + log.date);
+        return new Date(log.date) >= fromDate;
+      });
     }
+    // if (from) {
+    //   const fromDate = new Date(from);
+    //   filterLog = filterLog.filter((log) => {
+    //     console.log(new Date(log.date) >= fromDate);
+    //   });
+    // }
+    // if (to) {
+    //   // to = to + " 00:00";
+    //   // console.log("test to:" + to);
+    //   // const initToDate = new Date(req.params.to + `T00:00:00-04:00`);
+    //   // console.log(initToDate);
+    //   // const postToDate = new Date(initToDate).toDateString();
+    //   // console.log(postToDate);
+    //   filterLog = filterLog.filter((log) => {
+    //     console.log(
+    //       `to: ${postToDate} || logdate: ${new Date(log.date).toDateString()}`
+    //     );
+    //     console.log(
+    //       new Date(log.date).toDateString() === postToDate ||
+    //         new Date(log.date).valueOf() < postToDate.valueOf()
+    //     );
+    //     return new Date(log.date) <= postToDate.valueOf();
+    //   });
+    // }
     if (to) {
       const toDate = new Date(to);
-      filterLog = filterLog.filter((log) => new Date(log.date) < toDate);
+      // console.log(toDate.toDateString());
+      filterLog = filterLog.filter((log) => {
+        // console.log("to: " + log.date);
+        return new Date(log.date) <= toDate;
+      });
     }
+
     //console.log("after filter");
     if (limit) {
       filterLog = filterLog.slice(0, limit);
