@@ -113,11 +113,11 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     duration: newExercise.duration,
     date: newExercise.date,
   };
-  let returnObj = {
-    ...userObj,
-    ...exObj,
-  };
-  return res.json(returnObj);
+  // let returnObj = {
+  //   ...userObj,
+  //   ...exObj,
+  // };
+  return res.json({ ...userObj, ...exObj });
 });
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
