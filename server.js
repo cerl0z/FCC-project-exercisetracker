@@ -105,8 +105,8 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   await newExercise.save();
 
   let userObj = {
-    username: user.username,
     _id: user._id,
+    username: user.username,
     description: newExercise.description,
     duration: newExercise.duration,
     date: newExercise.date,
