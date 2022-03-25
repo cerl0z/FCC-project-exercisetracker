@@ -75,7 +75,7 @@ app.get("/api/users", async (req, res) => {
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const userId = req.params._id;
   const descriptionToAdd = req.body.description;
-  const durationToAdd = req.body.duration;
+  const durationToAdd = parseInt(req.body.duration);
   let dateToAdd = !req.params.date
     ? new Date().toDateString()
     : new Date(req.params.date).toDateString();
