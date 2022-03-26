@@ -108,7 +108,14 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
   let userId = req.params._id;
+
+  let from = new Date(req.query.from + "T00:00:00") || new Date(0);
+  let to = new Date(req.query.to + "T00:00:00") || new Date(Date.now());
+  console.log("from query" + req.query.from);
+  let limit = Number(req.query.limit) || 0;
+
   let user = await User.findById({ _id: userId });
+  let filterLog = user.log;
   if (user) {
     let count = user.log.length;
 
@@ -119,6 +126,41 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
     }));
 
     console.log("user found");
+    if (from && to && limit) {
+      if (from) {
+        const fromDate = new Date(from);
+        filterLog = filterLog.filter((log) => {
+          console.log(`logdate: ${new Date(log.date)} || fromDate:${fromDate}`);
+          console.log(`fromTest?: ${new Date(log.date) >= fromDate}`);
+          return new Date(log.date) >= fromDate;
+        });
+      }
+
+      if (to) {
+        const toDate = new Date(to);
+
+        console.log("--------------");
+        filterLog = filterLog.filter((log) => {
+          console.log(`logdate: ${new Date(log.date)} || toDate:${toDate}`);
+          console.log(`toTest?: ${new Date(log.date) <= toDate}`);
+          return new Date(log.date) <= toDate;
+        });
+      }
+
+      if (limit) {
+        filterLog = filterLog.slice(0, limit);
+      }
+
+      const returnLog = filterLog.map((log) => ({
+        description: log.description,
+        duration: log.duration,
+        date: log.date.toString(),
+      }));
+
+      return res.json({
+        log: returnLog,
+      });
+    }
     return res.json({
       username: user.username,
       count: count,
@@ -136,10 +178,10 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
   let userId = req.params._id;
   let from = new Date(req.params.from + "T00:00:00") || new Date(0);
   let to = new Date(req.params.to + "T00:00:00") || new Date(Date.now());
-
+  console.log(req.query.from);
+  let limit = Number(req.params.limit) || 0;
   // console.log(`req.params.to: ` + req.params.to);
   // console.log(`To: ` + to);
-  let limit = Number(req.params.limit) || 0;
   let user = await User.findById({ _id: userId });
 
   let filterLog = user.log;
@@ -152,34 +194,10 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
         return new Date(log.date) >= fromDate;
       });
     }
-    // if (from) {
-    //   const fromDate = new Date(from);
-    //   filterLog = filterLog.filter((log) => {
-    //     console.log(new Date(log.date) >= fromDate);
-    //   });
-    // }
-    // if (to) {
-    //   // to = to + " 00:00";
-    //   // console.log("test to:" + to);
-    //   // const initToDate = new Date(req.params.to + `T00:00:00-04:00`);
-    //   // console.log(initToDate);
-    //   // const postToDate = new Date(initToDate).toDateString();
-    //   // console.log(postToDate);
-    //   filterLog = filterLog.filter((log) => {
-    //     console.log(
-    //       `to: ${postToDate} || logdate: ${new Date(log.date).toDateString()}`
-    //     );
-    //     console.log(
-    //       new Date(log.date).toDateString() === postToDate ||
-    //         new Date(log.date).valueOf() < postToDate.valueOf()
-    //     );
-    //     return new Date(log.date) <= postToDate.valueOf();
-    //   });
-    // }
+
     if (to) {
-      // const toDate = new Date(new Date(to));
       const toDate = new Date(to);
-      // console.log(toDate.toDateString());
+
       console.log("--------------");
       filterLog = filterLog.filter((log) => {
         console.log(`logdate: ${new Date(log.date)} || toDate:${toDate}`);
@@ -188,27 +206,19 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
       });
     }
 
-    //console.log("after filter");
     if (limit) {
       filterLog = filterLog.slice(0, limit);
     }
+
     const returnLog = filterLog.map((log) => ({
       description: log.description,
       duration: log.duration,
       date: log.date.toString(),
     }));
 
-    // return res.json({
-    //   log: filterLog.map((log) => ({
-    //     description: log.description,
-    //     duration: log.duration,
-    //     date: log.date,
-    //   })),
     return res.json({
       log: returnLog,
     });
-
-    //}
   }
 });
 
