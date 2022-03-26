@@ -103,7 +103,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     description: newExercise.description,
   };
 
-  res.send(userObj);
+  res.json(userObj);
 });
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
@@ -139,7 +139,7 @@ app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
 
   // console.log(`req.params.to: ` + req.params.to);
   // console.log(`To: ` + to);
-  let limit = req.params.limit;
+  let limit = Number(req.params.limit);
   let user = await User.findById({ _id: userId });
 
   let filterLog = user.log;
