@@ -134,8 +134,8 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
 
 app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
   let userId = req.params._id;
-  let from = new Date(req.params.from + "T00:00:00-04:00") || new Date(0);
-  let to = new Date(req.params.to + "T00:00:00-04:00") || new Date(Date.now());
+  let from = new Date(req.params.from + "T00:00:00") || new Date(0);
+  let to = new Date(req.params.to + "T00:00:00") || new Date(Date.now());
 
   // console.log(`req.params.to: ` + req.params.to);
   // console.log(`To: ` + to);
@@ -147,7 +147,7 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
     if (from) {
       const fromDate = new Date(from);
       filterLog = filterLog.filter((log) => {
-        // console.log("from: " + log.date);
+        console.log(`logdate: ${log.date} || fromDate:${fromDate}`);
         return new Date(log.date) >= fromDate;
       });
     }
@@ -176,10 +176,11 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
     //   });
     // }
     if (to) {
+      // const toDate = new Date(new Date(to));
       const toDate = new Date(to);
       // console.log(toDate.toDateString());
       filterLog = filterLog.filter((log) => {
-        // console.log("to: " + log.date);
+        console.log(`logdate: ${log.date} || toDate:${toDate}`);
         return new Date(log.date) <= toDate;
       });
     }
