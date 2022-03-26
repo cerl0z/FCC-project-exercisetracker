@@ -134,12 +134,12 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
 
 app.get("/api/users/:_id/logs/:from/:to/:limit?", async (req, res) => {
   let userId = req.params._id;
-  let from = new Date(req.params.from + "T00:00:00-04:00");
-  let to = new Date(req.params.to + "T00:00:00-04:00");
+  let from = new Date(req.params.from + "T00:00:00-04:00") || new Date(0);
+  let to = new Date(req.params.to + "T00:00:00-04:00") || new Date(Date.now());
 
   // console.log(`req.params.to: ` + req.params.to);
   // console.log(`To: ` + to);
-  let limit = Number(req.params.limit);
+  let limit = Number(req.params.limit) || 0;
   let user = await User.findById({ _id: userId });
 
   let filterLog = user.log;
