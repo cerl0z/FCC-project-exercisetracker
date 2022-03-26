@@ -147,7 +147,8 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
     if (from) {
       const fromDate = new Date(from);
       filterLog = filterLog.filter((log) => {
-        console.log(`logdate: ${log.date} || fromDate:${fromDate}`);
+        console.log(`logdate: ${new Date(log.date)} || fromDate:${fromDate}`);
+        console.log(`fromTest?: ${new Date(log.date) >= fromDate}`);
         return new Date(log.date) >= fromDate;
       });
     }
@@ -179,8 +180,10 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
       // const toDate = new Date(new Date(to));
       const toDate = new Date(to);
       // console.log(toDate.toDateString());
+      console.log("--------------");
       filterLog = filterLog.filter((log) => {
-        console.log(`logdate: ${log.date} || toDate:${toDate}`);
+        console.log(`logdate: ${new Date(log.date)} || toDate:${toDate}`);
+        console.log(`toTest?: ${new Date(log.date) <= toDate}`);
         return new Date(log.date) <= toDate;
       });
     }
@@ -201,7 +204,9 @@ app.get("/api/users/:_id/logs/:from?/:to?/:limit?", async (req, res) => {
     //     duration: log.duration,
     //     date: log.date,
     //   })),
-    return res.json(returnLog);
+    return res.json({
+      log: returnLog,
+    });
 
     //}
   }
