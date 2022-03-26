@@ -80,15 +80,6 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     ? new Date().toDateString()
     : new Date(req.params.date + "T00:00:00-04:00").toDateString();
 
-  // console.log(`req.body.date=${req.body.date}`);
-
-  // let dateToAdd = new Date(req.body.date.replace(/-/g, "/")).toDateString();
-  // // console.log(dateToAdd);
-  // if (!req.body.date) {
-  //   dateToAdd = new Date().toDateString();
-  // }
-
-  //const dateToAdd = new Date(req.body.date).toDateString();
   const exObject = {
     description: descriptionToAdd,
     duration: durationToAdd,
@@ -112,7 +103,7 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     description: newExercise.description,
   };
 
-  return res.json(userObj);
+  res.send(userObj);
 });
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
@@ -120,7 +111,6 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
   let user = await User.findById({ _id: userId });
   if (user) {
     let count = user.log.length;
-    //console.log(`from:${from}, to:${to}, limit:${limit}`);
 
     let exLog = user.log.map((log) => ({
       description: log.description,
