@@ -108,10 +108,9 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 
 app.get("/api/users/:_id/logs/", async (req, res) => {
   let userId = req.params._id;
-  let limitQuery = req.query.limit;
-  let fromQuery = req.query.from;
-  let toQuery = req.query.to;
 
+  // Prepare for cases where query values are empty
+  let limit = req.query.limit ? Number(req.query.limit) : 0;
   let from = req.query.from
     ? new Date(req.query.from + "T00:00:00")
     : new Date(0);
@@ -119,7 +118,6 @@ app.get("/api/users/:_id/logs/", async (req, res) => {
     ? new Date(req.query.to + "T00:00:00")
     : new Date(Date.now());
   console.log("from query: " + req.query.from);
-  let limit = req.query.limit ? Number(req.query.limit) : 0;
 
   let user = await User.findById({ _id: userId });
   let filterLog = user.log;
